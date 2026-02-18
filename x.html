@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday App</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial;transition:.4s;}
+
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+overflow:hidden;
+background:url("https://images.unsplash.com/photo-1513151233558-d860c5398176") center/cover;
+}
+.marquee {
+  position:fixed;
+  top:0;
+  width:100%;
+  background:rgba(0,0,0,0.6);
+  overflow:hidden;
+  white-space:nowrap;
+  padding:10px 0;
+  z-index:10;
+  border-bottom: 2px solid lime;
+}
+
+.marquee span {
+  display:inline-block;
+  font-weight:bold;
+  font-size:24px;
+  color:yellow;
+  padding-left:100%;
+  animation:marqueeMove 10s linear infinite;
+  text-shadow: 0 0 10px lime, 0 0 20px cyan;
+}
+
+@keyframes marqueeMove {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-100%); }
+}
+
+/* 🎂 cake */
+.cake{
+  position:absolute;
+  top:20px;
+  font-size:60px;
+  animation:bounce 2s ease-in-out infinite;
+}
+@keyframes bounce{
+  0%{transform:translateY(0);}
+  50%{transform:translateY(-20px);}
+  100%{transform:translateY(0);}
+}
+
+/* balloons */
+.balloons{position:fixed;bottom:-150px;width:100%;}
+.balloon{position:absolute;font-size:26px;animation:floatUp linear infinite;}
+@keyframes floatUp{to{transform:translateY(-120vh) rotate(360deg);}}
+
+/* cake */
+.cake{position:absolute;top:20px;font-size:60px;cursor:pointer;}
+.flame{position:absolute;top:-10px;left:26px;width:8px;height:14px;background:orange;border-radius:50%;animation:flicker .2s infinite alternate;}
+@keyframes flicker{to{transform:scale(1.3);opacity:.6;}}
+
+
+/* card */
+.card{
+width:360px;padding:30px;border-radius:20px;
+backdrop-filter:blur(15px);
+background:rgba(0,0,0,.6);
+box-shadow:0 0 25px lime;
+position:relative;
+transition: 360deg;
+}
+
+/* 360 rotate on hover */
+.card:hover{
+  transform:rotate(360deg) scale(1.05);
+  transition:1s ease-in-out;
+}
+.card {
+  width:360px;
+  padding:30px;
+  border-radius:20px;
+  backdrop-filter:blur(15px);
+  background:rgba(0,0,0,.6);
+  position:relative;
+  transform-style:preserve-3d;
+
+  animation: formRotate 1.2s ease-out,
+             neonPulse 1.5s infinite alternate;
+}
+
+h2{text-align:center;color:white;margin-bottom:20px;text-shadow:0 0 10px lime;}
+
+.input-box{margin-bottom:15px;position:relative;}
+input{
+width:100%;padding:12px;border:none;border-radius:10px;
+background:rgba(255,255,255,.1);color:white;
+}
+input::placeholder{color:#aaa;}
+.email{color:lime;}
+.pass{color:darkred;}
+
+button{
+width:100%;padding:12px;border:none;border-radius:12px;
+background:#00d9ff;font-weight:bold;cursor:pointer;
+}
+button:hover{transform:scale(1.1) rotate(5deg);background:green;color:white;}
+
+.link{color:cyan;text-align:center;margin-top:10px;cursor:pointer;font-size:14px;}
+
+.popup{
+position:fixed;top:50%;left:50%;
+transform:translate(-50%,-50%) scale(0);
+background:#111;padding:25px;border-radius:15px;
+box-shadow:0 0 20px lime;color:white;width:260px;text-align:center;
+}
+.popup.active{transform:translate(-50%,-50%) scale(1) rotate(360deg);}
+
+.timer{margin-top:8px;font-size:13px;color:#ccc;}
+
+.success{
+position:fixed;bottom:20px;background:lime;color:black;
+padding:12px 20px;border-radius:10px;opacity:0;
+}
+.success.show{opacity:1;bottom:70px;}
+
+.hidden{display:none;}
+
+@media(max-width:400px){.card{width:90%;}}
+</style>
+</head>
+
+<body>
+<div class="marquee">
+  <span>🎉 HAPPY BIRTHDAY 🎉</span>
+</div> 
+
+<div class="cake" onclick="cutCake()">🎂<div class="flame"></div></div>
+<div class="balloons" id="balloons"></div>
+
+<div class="card">
+
+<!-- LOGIN -->
+<div id="loginForm">
+<h2>🎉 Birthday Login</h2>
+
+<div class="input-box">
+<input class="email" placeholder="Email">
+</div>
+
+<div class="input-box">
+<input class="pass" type="password" placeholder="Password">
+</div>
+
+<label style="color:white;font-size:13px;">
+<input type="checkbox" onclick="warn()"> Remember me
+</label>
+
+<button onclick="showOTP()">Login</button>
+
+<div class="link" onclick="showRegister()">Create account</div>
+<div class="link" onclick="showForgot()">Forgot password?</div>
+</div>
+
+<!-- REGISTER -->
+<div id="registerForm" class="hidden">
+<h2>Register</h2>
+<input placeholder="First name">
+<input placeholder="Last name">
+<input placeholder="Mobile number">
+<input placeholder="Email">
+<input type="password" placeholder="New password">
+<input type="password" placeholder="Confirm password">
+<button onclick="alert('Account created!')">Sign Up</button>
+<div class="link" onclick="showLogin()">Back to login</div>
+</div>
+
+<!-- FORGOT -->
+<div id="forgotForm" class="hidden">
+<h2>Reset Password</h2>
+<input placeholder="Email">
+<input placeholder="OTP">
+<input type="password" placeholder="New password">
+<button onclick="alert('Password reset!')">Reset</button>
+<div class="link" onclick="showLogin()">Back</div>
+</div>
+
+</div>
+
+<!-- OTP -->
+<div class="popup" id="otp">
+<h3>Enter OTP</h3>
+<input placeholder="OTP">
+<div class="timer">Time left: <span id="time">60</span>s</div>
+<button onclick="success()">Verify</button>
+<button onclick="startTimer()">Resend OTP</button>
+</div>
+
+<div class="success" id="success">🎉 Happy Birthday! Login Success!</div>
+
+<script>
+/* balloons */
+const container=document.getElementById("balloons");
+for(let i=0;i<80;i++){
+let b=document.createElement("div");
+b.className="balloon";
+b.innerHTML="🎈";
+b.style.left=Math.random()*100+"%";
+b.style.animationDuration=(5+Math.random()*5)+"s";
+container.appendChild(b);
+}
+
+/* timer */
+let timer;
+function startTimer(){
+let t=60;
+document.getElementById("time").innerText=t;
+clearInterval(timer);
+timer=setInterval(()=>{
+t--;
+document.getElementById("time").innerText=t;
+if(t<=0){clearInterval(timer);}
+},1000);
+}
+
+function showOTP(){
+document.getElementById("otp").classList.add("active");
+startTimer();
+}
+
+function success(){
+document.getElementById("otp").classList.remove("active");
+let s=document.getElementById("success");
+s.classList.add("show");
+setTimeout(()=>s.classList.remove("show"),3000);
+alert("Welcome! 🎉");
+}
+
+/* cake cut */
+function cutCake(){
+alert("🎂 Cake Cut! Happy Birthday!");
+}
+
+/* remember me warning */
+function warn(){
+alert("⚠ Your data may be stored on server. Be alert!");
+}
+
+/* form switching */
+function showRegister(){
+loginForm.classList.add("hidden");
+registerForm.classList.remove("hidden");
+}
+function showForgot(){
+loginForm.classList.add("hidden");
+forgotForm.classList.remove("hidden");
+}
+function showLogin(){
+registerForm.classList.add("hidden");
+forgotForm.classList.add("hidden");
+loginForm.classList.remove("hidden");
+}
+</script>
+
+</body>
+</html>
